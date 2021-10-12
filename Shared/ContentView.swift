@@ -6,29 +6,65 @@
 //
 
 import SwiftUI
+import AVFoundation
+import AVKit
 
-/*
-let flycatcher = UIImage(named: "flycatcher")
-let crow = UIImage(named: "crow")
-let great_tit = UIImage(named: "great_tit")
-let magpie = UIImage(named: "magpie")
-let seagull = UIImage(named: "seagull")
-var images: [UIImage] = [named: flycatcher]
-*/
+var audioPlayer: AVAudioPlayer!
 
-let birds = ["Flycatcher", "Crow",
-            "Great Tit", "Magpie",
-            "Seagull"]
+let birds = ["Kirjosieppo", "Varis",
+            "Talitintti", "Harakka",
+            "Lokki"]
+
+let flycatcherSound = NSDataAsset(name: "mac_flycatcher")
+let crowSound = NSDataAsset(name: "mac_crow")
+let greatTitSound = NSDataAsset(name: "mac_great_tit")
+let magpieSound = NSDataAsset(name: "mac_magpie")
+let seagullSound = NSDataAsset(name: "mac_seagull")
+
+let birdSounds = [flycatcherSound, crowSound,
+                greatTitSound, magpieSound,
+                seagullSound]
 
 
 struct ContentView: View {
     @State var birdIndex = 0;
     var body: some View {
-
+        
         HStack(
             alignment: .top,
             spacing: 10
         ) {
+            Button{
+                //Play sound
+                print("Played sound")
+                
+                guard let url = Bundle.main.url(forResource: "mac_flycatcher", withExtension: "mp3") else { return }
+                
+                do {
+                    try AVAudioSession.sharedInstance().setCategory(.playback, mode: .default)
+                    try AVAudioSession.sharedInstance().setActive(true)
+                    audioPlayer = try AVAudioPlayer(contentsOf: url, fileTypeHint: AVFileType.mp3.rawValue)
+                    
+                    guard let audioPlayer = audioPlayer else { return }
+                    
+                    audioPlayer.play()
+                    
+                } catch let error {
+                    print(error.localizedDescription)
+                }
+
+            } label: {
+                Text("Play sound")
+                    .padding(20)
+            }
+            .contentShape(Rectangle())
+        }
+        
+        HStack(
+            alignment: .top,
+            spacing: 10
+        ) {
+            
             Button{
                 //previous button action
                 print("Previous pressed.")
@@ -93,7 +129,7 @@ struct ContentView: View {
                 .frame(width: 200, height: 200, alignment: .center)
                 .clipShape(Circle())
         }
-        Text("Current bird: \(birds[birdIndex])")
+        Text("Kuvan lintu: \(birds[birdIndex])")
             .padding(20)
             .frame(alignment: .center)
     }
